@@ -120,6 +120,7 @@ jobs:
   deploy-release:
     name: Deploy and Release
     runs-on: ubuntu-latest
+    permissions: write-all
     environment:
       name: production
       url: https://gcstatus.netlify.app
