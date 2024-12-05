@@ -1,0 +1,97 @@
+{
+  "name": "bio",
+  "version": "0.0.1",
+  "description": "My bio portfolio",
+  "main": "postcss.config.mjs",
+  "scripts": {
+    "dev": "vite --open --host",
+    "build": "vite build",
+    "preview": "vite preview",
+    "prepare": "husky",
+    "semantic-release": "semantic-release",
+    "format": "prettier --write ./src && echo 'Formatting complete! Include any changes on your commit.'",
+    "lint": "eslint --fix ./src && echo 'Lint complete.'",
+    "type-check": "tsc && echo 'Type check complete.'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "bio"
+  },
+  "keywords": [
+    "bio",
+    "portfolio",
+    "dev",
+    "me",
+    "about",
+    "myself"
+  ],
+  "author": "felipebrsk",
+  "license": "ISC",
+  "release": {
+    "branches": [
+      "main"
+    ],
+    "plugins": [
+      [
+        "@semantic-release/commit-analyzer",
+        {
+          "releaseRules": [
+            {
+              "type": "docs",
+              "release": false
+            },
+            {
+              "type": "refactor",
+              "release": "patch"
+            },
+            {
+              "type": "chore",
+              "release": "patch"
+            },
+            {
+              "scope": "no-release",
+              "release": false
+            }
+          ]
+        }
+      ],
+      "@semantic-release/release-notes-generator",
+      "@semantic-release/github"
+    ]
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "nprogress": "^0.2.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-helmet-async": "^2.0.5",
+    "react-icons": "^5.4.0",
+    "react-router-dom": "^7.0.2"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.6.0",
+    "@commitlint/config-conventional": "^19.6.0",
+    "@eslint/compat": "^1.2.3",
+    "@types/nprogress": "^0.2.3",
+    "@types/react": "^18.3.13",
+    "@types/react-dom": "^18.3.1",
+    "@typescript-eslint/eslint-plugin": "^8.17.0",
+    "@typescript-eslint/parser": "^8.17.0",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^9.16.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-prettier": "^5.2.1",
+    "eslint-plugin-react": "^7.37.2",
+    "eslint-plugin-react-hooks": "^5.0.0",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
+    "husky": "^9.1.7",
+    "postcss": "^8.4.49",
+    "prettier": "^3.4.2",
+    "semantic-release": "^24.2.0",
+    "tailwindcss": "^3.4.16",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.2"
+  }
+}

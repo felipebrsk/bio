@@ -1,0 +1,167 @@
+name: CI
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened, ready_for_review]
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+jobs:
+  setup:
+    name: Setup
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        id: npm-cache
+        with:
+          key: ${{ runner.os }}-npm-${{ hashFiles('package-lock.json') }}
+          path: node_modules
+
+      - name: Install dependencies
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+        run: npm ci
+
+      - name: Lint code
+        run: npm run lint
+
+      - name: Type-check
+        run: npm run type-check
+
+  build-preview:
+    name: Build Preview
+    if: contains(github.ref, 'refs/heads/main') != true
+    needs: [setup]
+    runs-on: ubuntu-latest
+    env:
+      alias: preview-pr-${{ github.event.pull_request.number }}
+      NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+      NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+    environment:
+      name: preview-pr-${{ github.event.pull_request.number }}
+      url: ${{ steps.netlify.outputs.deploy-url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        id: npm-cache
+        with:
+          key: ${{ runner.os }}-npm-${{ hashFiles('package-lock.json') }}
+          path: node_modules
+
+      - name: Install dependencies
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+        run: npm ci
+
+      - name: cache build
+        uses: actions/cache@v4
+        id: build-cache
+        with:
+          key: ${{ runner.os }}-build-${{ hashFiles('src', 'dist', 'package-lock') }}
+          path: dist
+
+      - name: build
+        if: steps.build-cache.outputs.cache-hit != 'true'
+        run: npm run build
+
+      - name: Deploy preview on netlify
+        id: netlify
+        run: |
+          npx netlify deploy --dir=dist --alias=${{ env.alias }} --message "Preview deploy PR_${{ github.event.pull_request.number }} - ${{ github.event.pull_request.title }}"
+          echo "::set-output name=deploy-url::https://${{ env.alias }}--gcstatus.netlify.app"
+
+  deploy-staging:
+    name: Deploy staging environment
+    runs-on: ubuntu-latest
+    if: contains(github.ref, 'refs/heads/main')
+    environment:
+      name: staging
+      url: https://staging--gcstatus.netlify-app
+    env:
+      NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+      NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        id: npm-cache
+        with:
+          key: ${{ runner.os }}-npm-${{ hashFiles('package-lock.json') }}
+          path: node_modules
+
+      - name: Install dependencies
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+        run: npm ci
+
+      - name: build
+        run: npm run build
+
+      - name: Deploy on staging
+        run: npx netlify deploy --dir=dist --alias=staging  --message "Staging deploy"
+
+  deploy-release:
+    name: Deploy and Release
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://gcstatus.netlify.app
+    needs: [deploy-staging]
+    if: contains(github.ref, 'refs/heads/main')
+    env:
+      NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+      NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        id: npm-cache
+        with:
+          key: ${{ runner.os }}-npm-${{ hashFiles('package-lock.json') }}
+          path: node_modules
+
+      - name: Install dependencies
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+        run: npm ci
+
+      - name: build
+        run: npm run build
+
+      - name: Deploy on production
+        run: npx netlify deploy --dir=dist --prod  --message "Production deploy"
+
+      - name: Generate release
+        run: npm run semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  all_required_checks_passed:
+    name: All required checks passed
+    runs-on: ubuntu-latest
+    needs: [build-preview]
+    if: contains(github.ref, 'refs/heads/main') != true
+    steps:
+      - name: Mark PR as ready to merge
+        run: exit 0

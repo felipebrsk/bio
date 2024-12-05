@@ -1,0 +1,29 @@
+name: Lint PR title
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, edited]
+
+jobs:
+  lint-commit-message:
+    name: Lint PR title
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Clean packages
+        run: |
+          rm package.json package-lock.json|| true
+          npm init --yes --private
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Commitlint
+        run: npm add --dev commitlint @commitlint/config-conventional
+
+      - name: Run commit message lint on PR title
+        run: echo "${{ github.event.pull_request.title }}" | npx commitlint

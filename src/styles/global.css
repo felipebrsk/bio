@@ -1,0 +1,96 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+}
+
+@layer components {
+  .theme-dark .terminal-window {
+    background-color: #000;
+    color: #00ff00;
+  }
+
+  .theme-retro .terminal-window {
+    background-color: #f4a261;
+    color: #2a9d8f;
+  }
+
+  .theme-solarized .terminal-window {
+    background-color: #002b36;
+    color: #839496;
+  }
+
+  .theme-cyberpunk .terminal-window {
+    background-color: #ff00ff;
+    color: #00ffff;
+  }
+
+  .theme-light .terminal-window {
+    background-color: white;
+    color: #747474;
+  }
+
+  .theme-ice .terminal-window {
+    background-color: #1c3f5d;
+    color: #d0f4f6;
+  }
+
+  .theme-fire .terminal-window {
+    background-color: #000;
+    color: #ff4500;
+  }
+
+  .theme-space .terminal-window {
+    background-color: #1b1b2f;
+    color: #f5f5f5;
+  }
+
+  .theme-vintage .terminal-window {
+    background-color: #f8f1e5;
+    color: #3d2b1f;
+  }
+
+  .theme-neon .terminal-window {
+    background-color: #0f0f0f;
+    color: #39ff14;
+    text-shadow:
+      0 0 5px #39ff14,
+      0 0 10px #39ff14;
+  }
+
+  .theme-forest .terminal-window {
+    background-color: #2a4730;
+    color: #b7c59b;
+  }
+
+  .theme-sunset .terminal-window {
+    background-color: #ff4500;
+    color: #ffddc1;
+  }
+
+  .theme-midnight .terminal-window {
+    background-color: #2e3440;
+    color: #d8dee9;
+  }
+
+  .theme-ocean .terminal-window {
+    background-color: #013a63;
+    color: #a8dadc;
+  }
+
+  .theme-matrix .terminal-window {
+    background-color: #000;
+    color: #00ff00;
+    text-shadow: 0 0 5px #00ff00;
+  }
+}
+
+@layer utilities {
+  @keyframes bouncing-loader {
+    to {
+      opacity: 0.1;
+      transform: translateY(-0.5rem);
+    }
+  }
+}
