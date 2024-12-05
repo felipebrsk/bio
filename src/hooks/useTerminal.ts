@@ -1,24 +1,40 @@
-import { useRef, useState } from 'react'
+import {
+  ChangeEvent,
+  FormEvent,
+  KeyboardEvent,
+  useRef,
+  useState,
+} from 'react'
 
-import { commands, executeCommand } from '@/components/Terminal/modules'
+import { commands, executeCommand } from '@/commands'
 
 function useTerminal() {
   const historyIndexRef = useRef<number>(-1)
-  const [theme, setTheme] = useState<string>('dark')
   const [command, setCommand] = useState<string>('')
-  const [history, setHistory] = useState<string[]>([])
+  const [history, setHistory] = useState<string[]>(() => {
+    const storedHistory = localStorage.getItem('commandHistory')
+    return storedHistory ? JSON.parse(storedHistory) : []
+  })
   const [suggestions, setSuggestions] = useState<string[]>([])
-  const [output, setOutput] = useState<string[]>([
-    'Type `help` to get started...',
+  const [output, setOutput] = useState<
+    { message: string; timestamp: string }[]
+  >([
+    {
+      message: 'Type `help` to get started...',
+      timestamp: new Date().toLocaleString(),
+    },
   ])
+  const [theme, setTheme] = useState<string>(() => {
+    return localStorage.getItem('theme') || 'dark'
+  })
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.toLowerCase()
     setCommand(value)
 
     if (value) {
       const filteredSuggestions = commands.filter((cmd) =>
-        cmd.startsWith(value),
+        cmd.includes(value),
       )
       setSuggestions(filteredSuggestions)
     } else {
@@ -26,7 +42,7 @@ function useTerminal() {
     }
   }
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Tab' && suggestions.length > 0) {
       e.preventDefault()
       setCommand(suggestions[0])
@@ -58,10 +74,18 @@ function useTerminal() {
     }
   }
 
-  const handleCommand = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleCommand = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    setOutput((prev) => [...prev, `> ${command}`])
-    setHistory((prev) => [...prev, command])
+    const timestamp = new Date().toLocaleString()
+    setOutput((prev) => [...prev, { message: `> ${command}`, timestamp }])
+    setHistory((prev) => {
+      const updatedHistory = [...prev, command]
+      localStorage.setItem(
+        'commandHistory',
+        JSON.stringify(updatedHistory),
+      )
+      return updatedHistory
+    })
     executeCommand(command, history, setTheme, setOutput)
     setCommand('')
     setSuggestions([])

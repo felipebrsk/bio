@@ -40,25 +40,38 @@ function Input({
       />
       {suggestions.length > 0 && (
         <div className="absolute left-6 bottom-full mb-2 bg-gray-800 border border-gray-700 rounded-md p-2 z-50 max-h-40 overflow-y-auto">
-          {suggestions.map((suggestion, index) => (
-            <div
-              key={index}
-              role="button"
-              tabIndex={0}
-              className="cursor-pointer hover:bg-gray-700 px-2 py-1"
-              onClick={() => {
-                setCommand(suggestion)
-                setSuggestions([])
-              }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
+          {suggestions.map((suggestion, index) => {
+            const matchIndex = suggestion
+              .toLowerCase()
+              .indexOf(command.toLowerCase())
+
+            return (
+              <div
+                key={index}
+                role="button"
+                tabIndex={0}
+                className="cursor-pointer hover:bg-gray-700 px-2 py-1"
+                onClick={() => {
                   setCommand(suggestion)
                   setSuggestions([])
-                }
-              }}>
-              {suggestion}
-            </div>
-          ))}
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    setCommand(suggestion)
+                    setSuggestions([])
+                  }
+                }}>
+                {suggestion.slice(0, matchIndex)}
+                <span className="suggestion-highlight">
+                  {suggestion.slice(
+                    matchIndex,
+                    matchIndex + command.length,
+                  )}
+                </span>
+                {suggestion.slice(matchIndex + command.length)}
+              </div>
+            )
+          })}
         </div>
       )}
     </form>

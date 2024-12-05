@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 
 interface BodyProps {
-  output: string[]
+  output: { message: string; timestamp: string }[]
 }
 
 function Body({ output }: BodyProps) {
@@ -21,7 +21,9 @@ function Body({ output }: BodyProps) {
       ref={terminalBodyRef}
       className="terminal-body flex-grow overflow-y-auto p-4"
       dangerouslySetInnerHTML={{
-        __html: output.map((line) => `<div>${line}</div>`).join(''),
+        __html: output
+          .map((line) => `<div>[${line.timestamp}]: ${line.message}</div>`)
+          .join(''),
       }}
     />
   )

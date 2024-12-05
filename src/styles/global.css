@@ -84,6 +84,15 @@
     color: #00ff00;
     text-shadow: 0 0 5px #00ff00;
   }
+
+  .terminal-body {
+    scroll-behavior: smooth;
+  }
+
+  .suggestion-highlight {
+    color: #00ff00;
+    font-weight: bold;
+  }
 }
 
 @layer utilities {
