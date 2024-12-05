@@ -79,6 +79,8 @@ function useTerminal() {
     const timestamp = new Date().toLocaleString()
     setOutput((prev) => [...prev, { message: `> ${command}`, timestamp }])
     setHistory((prev) => {
+      if (!command) return prev
+
       const updatedHistory = [...prev, command]
       localStorage.setItem(
         'commandHistory',

@@ -4,6 +4,8 @@ import {
   FormEvent,
   KeyboardEvent,
   SetStateAction,
+  useEffect,
+  useRef,
 } from 'react'
 
 interface InputProps {
@@ -25,12 +27,21 @@ function Input({
   setCommand,
   setSuggestions,
 }: InputProps) {
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.focus()
+    }
+  }, [])
+
   return (
     <form
       onSubmit={handleCommand}
       className="bg-gray-900 p-2 flex w-full relative">
       <span className="text-white">$</span>
       <input
+        ref={inputRef}
         type="text"
         value={command}
         onChange={handleInputChange}
@@ -54,11 +65,13 @@ function Input({
                 onClick={() => {
                   setCommand(suggestion)
                   setSuggestions([])
+                  inputRef.current?.focus()
                 }}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
                     setCommand(suggestion)
                     setSuggestions([])
+                    inputRef.current?.focus()
                   }
                 }}>
                 {suggestion.slice(0, matchIndex)}

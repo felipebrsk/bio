@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "My bio portfolio",
   "main": "postcss.config.mjs",
+  "type": "module",
   "scripts": {
     "dev": "vite --open --host",
     "build": "vite build",
